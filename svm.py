@@ -15,7 +15,7 @@ from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 
-df = pd.read_csv('dataset_gemastik/try_gemastik10TrainV2.csv', sep=',')
+df = pd.read_csv('dataset_gemastik/dataset_jokowiV1fixclean.csv', sep=',')
 df2 = pd.read_csv('dataset_gemastik/try_gemastik10TestV2.csv', sep=',')
 
 ### USE IT FOR SEPARATE TRAINING SET & TESTING SET ###
@@ -96,7 +96,7 @@ misDataPred = [prediction
 misDF = pd.DataFrame({'teks':misDataTeks, 'actual':misDataTruth, 'prediction':misDataPred})
 print('Accuracy: ',metrics.accuracy_score(y_train, y_pred_class))
 print(metrics.confusion_matrix(y_train, y_pred_class))
-misDF.to_csv("errorAnalysis/error_svmJokowi.csv")
+misDF.to_csv("errorAnalysis/error_svmJKW.csv")
 
 # print(scores)
 ### END - USE IT FOR CROSS VALIDATION ### 
