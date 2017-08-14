@@ -15,7 +15,7 @@ from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 
-df = pd.read_csv('dataset_gemastik/dataset_jokowiV1fixclean.csv', sep=',')
+df = pd.read_csv('dataset_gemastik/dataset_jokowiV2fixclean.csv', sep=',')
 df2 = pd.read_csv('dataset_gemastik/try_gemastik10TestV2.csv', sep=',')
 
 ### USE IT FOR SEPARATE TRAINING SET & TESTING SET ###
@@ -74,11 +74,15 @@ y_train = df.is_kelas
 vect = TfidfVectorizer(binary=True)
 X_train_dtm = vect.fit_transform(X_train.values.astype('U'))
 
-svr = svm.SVC(kernel='linear',C=5.0,gamma=0.01)
-# grid = GridSearchCV(svr, parameters)
-scores = cross_val_score(svr, X_train_dtm, y_train, cv=5)
-
-y_pred_class = cross_val_predict(svr, X_train_dtm, y_train, cv=5)
+# svr = svm.SVC(kernel='linear',C=5.0,gamma=0.01)
+# scores = cross_val_score(svr, X_train_dtm, y_train, cv=5)
+# y_pred_class = cross_val_predict(svr, X_train_dtm, y_train, cv=5)
+parameters = {'kernel':('linear', 'rbf'), 'C':[1,5,10,15,25,50,75,100,150,200,250], 'gamma': 
+[0.01,0.02,0.03,0.04,0.05,0.1,0.2,0.3,0.4,0.5]}
+svr = svm.SVC()
+grid = GridSearchCV(svr, parameters)
+grid.fit(X_train_dtm,y_train)
+y_pred_class = cross_val_predict(grid, X_train_dtm, y_train, cv=5)
 
 misDataTeks = [teks
           for teks, truth, prediction in
@@ -94,6 +98,9 @@ misDataPred = [prediction
           if truth != prediction]
 
 misDF = pd.DataFrame({'teks':misDataTeks, 'actual':misDataTruth, 'prediction':misDataPred})
+print('Best C:',grid.best_estimator_.C)
+print('Best Kernel:',grid.best_estimator_.kernel)
+print('Best Gamma:',grid.best_estimator_.gamma)
 print('Accuracy: ',metrics.accuracy_score(y_train, y_pred_class))
 print(metrics.confusion_matrix(y_train, y_pred_class))
 misDF.to_csv("errorAnalysis/error_svmJKW.csv")

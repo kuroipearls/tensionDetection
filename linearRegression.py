@@ -7,7 +7,7 @@ from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 
-df = pd.read_csv('dataset_gemastik/dataset_jokowiV1fixclean.csv', sep=',')
+df = pd.read_csv('dataset_gemastik/dataset_jokowiV2fixclean.csv', sep=',')
 df2 = pd.read_csv('dataset_gemastik/try_gemastik10TestV2.csv', sep=',')
 
 ### USE IT WITH SEPARATE TRAINING SET & TESTING SET ###
