@@ -1,36 +1,50 @@
 import pandas as pd
 import numpy as np
-from sklearn import datasets, linear_model
-from sklearn.feature_extraction.text import TfidfVectorizer
+import time
+import csv
+from pandas import DataFrame
 from sklearn.cross_validation import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import svm
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import GridSearchCV
 from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
+from sklearn.linear_model import LogisticRegression
 
-df = pd.read_csv('datasetFinal/dataset2class_V4fix.csv', sep=',')
+df = pd.read_csv('datasetFinal/dataset3class_V4fixx.csv', sep=',')
+# df = df[df.is_kelas != 0]
 df2 = pd.read_csv('dataset_gemastik/try_gemastik10TestV2.csv', sep=',')
 
-### USE IT WITH SEPARATE TRAINING SET & TESTING SET ###
+### USE IT FOR SEPARATE TRAINING SET & TESTING SET ###
 # X_train = df.text
 # y_train = df.is_kelas
 # X_test = df2.text
 # y_test = df2.is_kelas
+
+# # vect = CountVectorizer(binary=True)
 # vect = TfidfVectorizer(binary=True)
 
 # X_train_dtm = vect.fit_transform(X_train.values.astype('U'))
 # # print(X_train_dtm)
 # X_test_dtm = vect.transform(X_test.values.astype('U'))
 
-# # Create linear regression object
-# regr = linear_model.LinearRegression()
+# X_train = df.text
+# y_train = df.is_kelas
+# X_test = df2.text
+# y_test = df2.is_kelas
 
-# # Train the model using the training sets
-# regr.fit(X_train_dtm, y_train)
+# parameters = {'kernel':('linear', 'rbf'), 'C':[1,5,10,15,25,50,75,100,150,200,250], 'gamma': 
+# [0.01,0.02,0.03,0.04,0.05,0.1,0.2,0.3,0.4,0.5]}
 
-# # Make predictions using the testing set
-# y_pred_class = regr.predict(X_test_dtm)
-# y_pred_class = y_pred_class.round()
-
+# svr = svm.SVC()
+# grid = GridSearchCV(svr, parameters)
+# grid.fit(X_train_dtm,y_train)
+# y_pred_class = grid.predict(X_test_dtm)
 # misDataTeks = [teks
 #           for teks, truth, prediction in
 #           zip(X_test, y_test, y_pred_class)
@@ -43,13 +57,17 @@ df2 = pd.read_csv('dataset_gemastik/try_gemastik10TestV2.csv', sep=',')
 #           for teks, truth, prediction in
 #           zip(X_test, y_test, y_pred_class)
 #           if truth != prediction]
-# misDF = pd.DataFrame({'teks':misDataTeks, 'actual':misDataTruth, 'prediction':misDataPred})
-# misDF.to_csv("errorAnalysis/error_linregression.csv")
 
+# misDF = pd.DataFrame({'teks':misDataTeks, 'actual':misDataTruth, 'prediction':misDataPred})
+
+# print('Best C:',grid.best_estimator_.C)
+# print('Best Kernel:',grid.best_estimator_.kernel)
+# print('Best Gamma:',grid.best_estimator_.gamma)
 # print('Accuracy: ',metrics.accuracy_score(y_test, y_pred_class))
 # print(metrics.confusion_matrix(y_test, y_pred_class))
-# # print(y_pred_class)
-### END - USE IT WITH SEPARATE TRAINING AND TESTING SET ###
+
+# misDF.to_csv("errorAnalysis/error_svm.csv")
+### END - USE IT WITH SEPARATE TRAINING SET AND TESTING SET ###
 
 ### USE IT FOR CROSS VALIDATION ###
 X_train = df.text
@@ -58,10 +76,11 @@ y_train = df.is_kelas
 vect = TfidfVectorizer(binary=True)
 X_train_dtm = vect.fit_transform(X_train.values.astype('U'))
 
-clf = linear_model.LinearRegression()
-# scores = cross_val_score(clf, X_train_dtm, y_train, cv=5)
-y_pred_class = cross_val_predict(clf, X_train_dtm, y_train, cv=5)
-y_pred_class = y_pred_class.round()
+parameters = {'solver':('lbfgs', 'sag', 'newton-cg'), 'C':[1,5,10,15,25,50,75,100,150,200,250]}
+svr = LogisticRegression(multi_class='multinomial')
+grid = GridSearchCV(svr, parameters)
+grid.fit(X_train_dtm,y_train)
+y_pred_class = cross_val_predict(grid, X_train_dtm, y_train, cv=20)
 
 misDataTeks = [teks
           for teks, truth, prediction in
@@ -77,9 +96,12 @@ misDataPred = [prediction
           if truth != prediction]
 
 misDF = pd.DataFrame({'teks':misDataTeks, 'actual':misDataTruth, 'prediction':misDataPred})
+print('Best C:',grid.best_estimator_.C)
+print('Best Solver:',grid.best_estimator_.solver)
+print('Best Penalty:',grid.best_estimator_.penalty)
 print('Accuracy: ',metrics.accuracy_score(y_train, y_pred_class))
 print(metrics.confusion_matrix(y_train, y_pred_class))
-# misDF.to_csv("errorAnalysis/error_linregressionJKW.csv")
+# misDF.to_csv("dataGemastikBinary/error_svmNoStem.csv")
 
 # print(scores)
 ### END - USE IT FOR CROSS VALIDATION ### 

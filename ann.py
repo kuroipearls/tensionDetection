@@ -8,7 +8,7 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
 
-df = pd.read_csv('dataset_gemastik/dataset_jokowiV4fixclean.csv', sep=',')
+df = pd.read_csv('datasetFinal/dataset3class_V4fix.csv', sep=',')
 
 X_train = df.text
 y_train = df.is_kelas
